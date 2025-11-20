@@ -1,10 +1,11 @@
 DROP DATABASE IF EXISTS money_heist;
 CREATE DATABASE money_heist;
-USE money_heist;    
+USE money_heist;
 
+/* Core entities: generate numeric ids with AUTO_INCREMENT */
 CREATE TABLE POLICE
 (
-    police_id INT PRIMARY KEY,
+    police_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     mid_name VARCHAR(50),
     last_name VARCHAR(50),
@@ -14,7 +15,7 @@ CREATE TABLE POLICE
 
 CREATE TABLE POLICE_CONTACT
 (
-    police_id INT ,
+    police_id INT NOT NULL,
     phone_number VARCHAR(15) NOT NULL,
     email VARCHAR(100) NOT NULL,
     PRIMARY KEY (police_id, phone_number, email),
@@ -37,10 +38,10 @@ CREATE TABLE EVIDENCE
 );
 
 CREATE TABLE HOSTAGES
-(   
-    hostage_id INT PRIMARY KEY ,
+(
+    hostage_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
-    mid_name VARCHAR(50) ,
+    mid_name VARCHAR(50),
     last_name VARCHAR(50),
     age INT NOT NULL,
     status ENUM('Pending','In-Progress','Resolved') NOT NULL,
@@ -57,7 +58,7 @@ CREATE TABLE HOSTAGES
 CREATE TABLE HOSTAGE_MEDICAL_CONDITION
 (
     hostage_id INT NOT NULL,
-    hostage_ailment VARCHAR(100) NOT NULL,
+    hostage_ailment VARCHAR(255) NOT NULL,
     PRIMARY KEY (hostage_id, hostage_ailment),
     FOREIGN KEY (hostage_id) REFERENCES HOSTAGES(hostage_id)
         ON DELETE CASCADE
@@ -66,9 +67,9 @@ CREATE TABLE HOSTAGE_MEDICAL_CONDITION
 
 CREATE TABLE DEPENDENTS
 (
-    dependent_id INT PRIMARY KEY,
+    dependent_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
-    mid_name VARCHAR(50) ,
+    mid_name VARCHAR(50),
     last_name VARCHAR(50),
     hostage_id INT NOT NULL,
     relation VARCHAR(50) NOT NULL,
@@ -80,22 +81,23 @@ CREATE TABLE DEPENDENTS
 
 CREATE TABLE TEAM_MEMBERS
 (
-    member_id INT PRIMARY KEY,
+    member_id INT AUTO_INCREMENT PRIMARY KEY,
     code_name VARCHAR(50) NOT NULL,
-    is_inside_mint BOOLEAN NOT NULL,
+    is_inside_mint BOOLEAN NOT NULL DEFAULT FALSE,
     role VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE TEAM_MEMBER_CONTACT
 (
-    member_id INT PRIMARY KEY,
+    member_id INT NOT NULL,
     phone_number VARCHAR(15) NOT NULL,
     email VARCHAR(100) NOT NULL,
+    PRIMARY KEY (member_id, phone_number, email),
     FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
+/*Contains the different member-id currently asigned to someone*/
 CREATE TABLE CREW
 (
     member_id INT PRIMARY KEY,
@@ -123,14 +125,14 @@ CREATE TABLE HACKER
 
 CREATE TABLE SECURITY_SYSTEM
 (
-    system_id INT PRIMARY KEY,
+    system_id INT AUTO_INCREMENT PRIMARY KEY,
     system_type VARCHAR(100) NOT NULL,
     status ENUM('Active','Inactive','Under Maintenance') NOT NULL,
-    location_description TEXT NOT NULL,
-    security_level VARCHAR(50) NOT NULL,
-    member_id INT NOT NULL,
+    location_description TEXT,
+    security_level VARCHAR(50),
+    member_id INT,
     FOREIGN KEY (member_id) REFERENCES HACKER(member_id)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
@@ -177,7 +179,7 @@ CREATE TABLE MISSIONS
     mission_id INT AUTO_INCREMENT PRIMARY KEY,
     mission_code VARCHAR(20) NOT NULL UNIQUE,
     start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP,
+    end_time TIMESTAMP ,
     stage ENUM('Planned','Ongoing','Completed','Failed') NOT NULL,
     zone VARCHAR(20) NOT NULL,
     description TEXT  
@@ -212,7 +214,8 @@ CREATE TABLE COMMUNICATION_LOG
 
 CREATE TABLE STRATEGIC_PLANNING
 (
-    member_id INT PRIMARY KEY,
+    planning_id INT AUTO_INCREMENT PRIMARY KEY,
+    member_id INT NOT NULL,
     mission_code VARCHAR(20) NOT NULL,
     channel_id INT NOT NULL,
     timestamp TIMESTAMP NOT NULL,
@@ -231,22 +234,40 @@ CREATE TABLE STRATEGIC_PLANNING
         ON UPDATE CASCADE
 );
 
+/* SAFEHOUSE must exist before equipment locations; define SAFEHOUSE next */
+CREATE TABLE SAFEHOUSE
+(
+    safehouse_id INT AUTO_INCREMENT PRIMARY KEY,
+    capacity INT NOT NULL,
+    security_level VARCHAR(50) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    street VARCHAR(100) NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    code INT NOT NULL
+);
+
 CREATE TABLE EQUIPMENT
 (
-    equipment_id INT PRIMARY KEY,
+    equipment_id INT AUTO_INCREMENT PRIMARY KEY,
     equipment_type VARCHAR(100) NOT NULL,
-    quantity INT DEFAULT 0,
-    curr_location_id INT NOT NULL,
-    criticality_level ENUM('High','Medium','Low') NOT NULL,
-    equipment_count INT NOT NULL
-    PRIMARY KEY (equipment_id, curr_location_id),
-    FOREIGN KEY (curr_location_id) REFERENCES SAFEHOUSE(safehouse_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
+    total_quantity INT DEFAULT 0,
+    criticality_level ENUM('High','Medium','Low') NOT NULL
+);
+
+/* Map equipment quantities per safehouse */
+CREATE TABLE EQUIPMENT_LOCATION
+(
+    equipment_id INT NOT NULL,
+    safehouse_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (equipment_id, safehouse_id),
     FOREIGN KEY (equipment_id) REFERENCES EQUIPMENT(equipment_id)
         ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (safehouse_id) REFERENCES SAFEHOUSE(safehouse_id)
+        ON DELETE CASCADE
         ON UPDATE CASCADE
-); 
+);
 
 CREATE TABLE MISSION_EXECUTION
 (
@@ -262,10 +283,10 @@ CREATE TABLE MISSION_EXECUTION
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     FOREIGN KEY (safehouse_id) REFERENCES SAFEHOUSE(safehouse_id)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
         ON UPDATE CASCADE,
     FOREIGN KEY (equipment_id) REFERENCES EQUIPMENT(equipment_id)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
@@ -274,7 +295,7 @@ CREATE TABLE SUPPLIER
     first_name VARCHAR(50) NOT NULL,
     mid_name VARCHAR(50),
     last_name VARCHAR(50),
-    supplier_id INT PRIMARY KEY,
+    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
     reliability_score ENUM('High','Medium','Low') NOT NULL
 );
 
@@ -288,16 +309,7 @@ CREATE TABLE SUPPLIER_CONTACT
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-CREATE TABLE SAFEHOUSE
-(
-    safehouse_id INT PRIMARY KEY,
-    capacity INT NOT NULL,
-    security_level VARCHAR(50) NOT NULL,
-    is_active BOOLEAN NOT NULL,
-    street VARCHAR(100) NOT NULL,
-    city VARCHAR(50) NOT NULL,
-    code INT NOT NULL
-);
+/* SAFEHOUSE was moved earlier */
 
 
 CREATE TABLE RESOURCE_COORDINATION
@@ -320,7 +332,8 @@ CREATE TABLE RESOURCE_COORDINATION
 CREATE TABLE LOOT
 (
     production_date DATE NOT NULL,
-    batch_id INT,
+    production_date DATE NOT NULL,
+    batch_id INT AUTO_INCREMENT,
     status ENUM('Stored','In-Transit','Secured') NOT NULL,
     amount DECIMAL(15,2) NOT NULL,
     stored_in_safehouse_id INT NOT NULL,
