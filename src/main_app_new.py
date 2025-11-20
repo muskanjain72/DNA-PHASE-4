@@ -255,6 +255,80 @@ def delete_equipment(connection):
 
 
 # ---------------------------------------------------------
+# HOSTAGE CRUD helpers (missing implementations)
+# ---------------------------------------------------------
+def add_new_hostage(connection):
+    """Insert a new hostage. hostage_id is AUTO_INCREMENT so we omit it."""
+    print_header("ADD NEW HOSTAGE")
+    try:
+        first = input("First name: ").strip()
+        mid = input("Middle name (or press Enter): ").strip() or None
+        last = input("Last name: ").strip()
+        age = input("Age (or press Enter): ").strip()
+        age_val = int(age) if age else None
+        status = input("Status (Pending/In-Progress/Resolved): ").strip() or 'Pending'
+        zone = input("Zone (e.g., Vault A / Lobby): ").strip() or None
+        govt_posn = input("Government position (or press Enter): ").strip() or None
+        risk = input("Risk factor (Low/Medium/High): ").strip() or None
+        police = input("Assigned police_id (or press Enter): ").strip()
+        police_id = int(police) if police else None
+
+        cur = connection.cursor()
+        query = ("INSERT INTO HOSTAGES (first_name, mid_name, last_name, age, status, zone, govt_posn, risk_factor, police_id) "
+                 "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)")
+        cur.execute(query, (first, mid, last, age_val, status, zone, govt_posn, risk, police_id))
+        connection.commit()
+        print(Fore.GREEN + "✔ Hostage added.")
+        cur.close()
+    except Error as e:
+        print(Fore.RED + f"❌ Error adding hostage: {e}")
+
+
+def update_hostage_status(connection):
+    """Update the status field for a hostage."""
+    print_header("UPDATE HOSTAGE STATUS")
+    try:
+        hid = int(input("Enter Hostage ID: "))
+        new_status = input("New status (Pending/In-Progress/Resolved): ").strip()
+        cur = connection.cursor()
+        cur.execute("UPDATE HOSTAGES SET status=%s WHERE hostage_id=%s", (new_status, hid))
+        connection.commit()
+        if cur.rowcount:
+            print(Fore.GREEN + "✔ Hostage status updated.")
+        else:
+            print(Fore.YELLOW + "⚠ No hostage updated (id may not exist).")
+        cur.close()
+    except Error as e:
+        print(Fore.RED + f"❌ Error updating hostage status: {e}")
+
+
+def delete_hostage(connection):
+    """Delete a hostage by id (with confirmation)."""
+    print_header("DELETE HOSTAGE")
+    try:
+        hid = int(input("Enter Hostage ID to delete: "))
+        confirm = input(Fore.RED + f"Type DELETE to confirm deletion of hostage {hid}: ").strip()
+        if confirm != 'DELETE':
+            print(Fore.YELLOW + "Deletion cancelled.")
+            return
+        cur = connection.cursor()
+        cur.execute("DELETE FROM HOSTAGES WHERE hostage_id=%s", (hid,))
+        connection.commit()
+        if cur.rowcount:
+            print(Fore.GREEN + "✔ Hostage deleted.")
+        else:
+            print(Fore.YELLOW + "⚠ No hostage deleted (id may not exist).")
+        cur.close()
+    except Error as e:
+        print(Fore.RED + f"❌ Error deleting hostage: {e}")
+
+
+# Backwards-compatible alias if any code expects this name
+def search_hostage_by_id(connection):
+    return get_hostage_by_id(connection)
+
+
+# ---------------------------------------------------------
 # MAIN MENU
 # ---------------------------------------------------------
 def main_menu(connection):
