@@ -46,6 +46,44 @@ def print_rows(rows):
     print("\n" + Fore.MAGENTA + "-" * 70)
 
 
+def _print_and_run(cur, query, params=None):
+    """Helper: print SQL and params, execute and return fetched rows (if any)."""
+    print(Fore.BLUE + "\n-- SQL QUERY --")
+    print(Fore.BLUE + query.strip())
+    if params:
+        print(Fore.BLUE + f"-- PARAMS: {params}")
+    try:
+        if params:
+            cur.execute(query, params)
+        else:
+            cur.execute(query)
+    except Error as e:
+        print(Fore.RED + f"❌ SQL execution error: {e}")
+        return []
+    # If it's a SELECT-like query, fetch rows
+    try:
+        return cur.fetchall()
+    except Exception:
+        return []
+
+
+def _print_and_exec(cur, query, params=None):
+    """Helper for non-SELECT statements: print SQL, execute, and return affected rowcount."""
+    print(Fore.BLUE + "\n-- SQL QUERY --")
+    print(Fore.BLUE + query.strip())
+    if params:
+        print(Fore.BLUE + f"-- PARAMS: {params}")
+    try:
+        if params:
+            cur.execute(query, params)
+        else:
+            cur.execute(query)
+        return cur.rowcount
+    except Error as e:
+        print(Fore.RED + f"❌ SQL execution error: {e}")
+        return 0
+
+
 # ---------------------------------------------------------
 # READ QUERIES
 # ---------------------------------------------------------
@@ -53,8 +91,8 @@ def view_all_hostages(connection):
     print_header("ALL HOSTAGES")
     try:
         cur = connection.cursor(dictionary=True)
-        cur.execute("SELECT * FROM HOSTAGES")
-        print_rows(cur.fetchall())
+        rows = _print_and_run(cur, "SELECT * FROM HOSTAGES")
+        print_rows(rows)
         cur.close()
     except Error as e:
         print(Fore.RED + f"❌ Error fetching hostages: {e}")
@@ -65,8 +103,8 @@ def get_hostage_by_id(connection):
     try:
         hid = int(input("Enter Hostage ID: "))
         cur = connection.cursor(dictionary=True)
-        cur.execute("SELECT * FROM HOSTAGES WHERE hostage_id=%s", (hid,))
-        result = cur.fetchone()
+        rows = _print_and_run(cur, "SELECT * FROM HOSTAGES WHERE hostage_id=%s", (hid,))
+        result = rows[0] if rows else None
         if result:
             print(Fore.GREEN + "\n🎯 Hostage Found:")
             print(Fore.CYAN + str(result))
@@ -89,8 +127,8 @@ def list_hostages_with_police(connection):
         LEFT JOIN POLICE p ON h.police_id = p.police_id
         ORDER BY h.hostage_id;
         """
-        cur.execute(query)
-        print_rows(cur.fetchall())
+        rows = _print_and_run(cur, query)
+        print_rows(rows)
         cur.close()
     except Error as e:
         print(Fore.RED + f"❌ {e}")
@@ -108,8 +146,8 @@ def equipment_by_safehouse(connection):
         JOIN EQUIPMENT e ON el.equipment_id = e.equipment_id
         ORDER BY s.safehouse_id, e.equipment_id;
         """
-        cur.execute(query)
-        print_rows(cur.fetchall())
+        rows = _print_and_run(cur, query)
+        print_rows(rows)
         cur.close()
     except Error as e:
         print(Fore.RED + f"❌ {e}")
@@ -128,8 +166,8 @@ def mission_members(connection):
         LEFT JOIN EQUIPMENT e ON me.equipment_id = e.equipment_id
         WHERE me.mission_code = %s;
         """
-        cur.execute(query, (mcode,))
-        print_rows(cur.fetchall())
+        rows = _print_and_run(cur, query, (mcode,))
+        print_rows(rows)
         cur.close()
     except Error as e:
         print(Fore.RED + f"❌ {e}")
@@ -148,8 +186,8 @@ def evidence_report(connection):
         ON e.evidence_id = cd.evidence_id AND e.police_id = cd.police_id
         ORDER BY e.found_time DESC;
         """
-        cur.execute(query)
-        print_rows(cur.fetchall())
+        rows = _print_and_run(cur, query)
+        print_rows(rows)
         cur.close()
     except Error as e:
         print(Fore.RED + f"❌ {e}")
@@ -167,8 +205,132 @@ def hostages_dependent_count(connection):
         GROUP BY h.hostage_id
         ORDER BY dependent_count DESC;
         """
-        cur.execute(query)
-        print_rows(cur.fetchall())
+        rows = _print_and_run(cur, query)
+        print_rows(rows)
+        cur.close()
+    except Error as e:
+        print(Fore.RED + f"❌ {e}")
+
+
+# ---------------------------------------------------------
+# Additional complex READ queries (each prints SQL before running)
+# ---------------------------------------------------------
+def mission_summary(connection):
+    """Summary per mission: member count, members list, safehouse and evidence count."""
+    print_header("MISSION SUMMARY")
+    try:
+        cur = connection.cursor(dictionary=True)
+        query = """
+        SELECT me.mission_code,
+               COUNT(DISTINCT me.member_id) AS member_count,
+               GROUP_CONCAT(DISTINCT t.code_name SEPARATOR ', ') AS members,
+               s.safehouse_id, s.street, s.city,
+               COUNT(DISTINCT cd.evidence_id) AS evidence_count
+        FROM MISSION_EXECUTION me
+        LEFT JOIN TEAM_MEMBERS t ON me.member_id = t.member_id
+        LEFT JOIN SAFEHOUSE s ON me.safehouse_id = s.safehouse_id
+        LEFT JOIN COLLECTED_DURING cd ON me.mission_code = cd.mission_code
+        GROUP BY me.mission_code
+        ORDER BY evidence_count DESC, member_count DESC;
+        """
+        rows = _print_and_run(cur, query)
+        print_rows(rows)
+        cur.close()
+    except Error as e:
+        print(Fore.RED + f"❌ {e}")
+
+
+def police_activity_report(connection):
+    """Activity per police: number of evidence items collected, missions involved, hostages claimed."""
+    print_header("POLICE ACTIVITY REPORT")
+    try:
+        cur = connection.cursor(dictionary=True)
+        query = """
+        SELECT p.police_id, p.first_name, p.last_name,
+               COUNT(DISTINCT e.evidence_id) AS evidence_found,
+               COUNT(DISTINCT cd.mission_code) AS missions_involved,
+               COUNT(DISTINCT h.hostage_id) AS hostages_claimed
+        FROM POLICE p
+        LEFT JOIN EVIDENCE e ON p.police_id = e.police_id
+        LEFT JOIN COLLECTED_DURING cd ON p.police_id = cd.police_id
+        LEFT JOIN CLAIMS c ON p.police_id = c.police_id
+        LEFT JOIN HOSTAGES h ON c.hostage_id = h.hostage_id
+        GROUP BY p.police_id
+        ORDER BY evidence_found DESC;
+        """
+        rows = _print_and_run(cur, query)
+        print_rows(rows)
+        cur.close()
+    except Error as e:
+        print(Fore.RED + f"❌ {e}")
+
+
+def supplier_resource_usage(connection):
+    """Which suppliers supply which safehouses and members (joins 3 tables)."""
+    print_header("SUPPLIER -> RESOURCE COORDINATION -> SAFEHOUSE")
+    try:
+        cur = connection.cursor(dictionary=True)
+        query = """
+        SELECT s.supplier_id, s.first_name, s.last_name,
+               rc.member_id, tm.code_name AS member_code,
+               rc.safehouse_id, sh.street AS safehouse_street, sh.city
+        FROM SUPPLIER s
+        JOIN RESOURCE_COORDINATION rc ON s.supplier_id = rc.supplier_id
+        LEFT JOIN TEAM_MEMBERS tm ON rc.member_id = tm.member_id
+        LEFT JOIN SAFEHOUSE sh ON rc.safehouse_id = sh.safehouse_id
+        ORDER BY s.supplier_id, rc.safehouse_id;
+        """
+        rows = _print_and_run(cur, query)
+        print_rows(rows)
+        cur.close()
+    except Error as e:
+        print(Fore.RED + f"❌ {e}")
+
+
+def high_risk_hostages_and_security(connection):
+    """Hostages flagged High risk with their medical conditions and monitoring systems."""
+    print_header("HIGH-RISK HOSTAGES & SECURITY MONITORING")
+    try:
+        cur = connection.cursor(dictionary=True)
+        query = """
+        SELECT h.hostage_id, h.first_name, h.last_name,
+               GROUP_CONCAT(DISTINCT hmc.hostage_ailment SEPARATOR '; ') AS ailments,
+               GROUP_CONCAT(DISTINCT ss.system_type SEPARATOR '; ') AS monitoring_systems
+        FROM HOSTAGES h
+        LEFT JOIN HOSTAGE_MEDICAL_CONDITION hmc ON h.hostage_id = hmc.hostage_id
+        LEFT JOIN MONITORED m ON h.hostage_id = m.hostage_id
+        LEFT JOIN SECURITY_SYSTEM ss ON m.system_id = ss.system_id
+        WHERE h.risk_factor = 'High'
+        GROUP BY h.hostage_id
+        ORDER BY h.hostage_id;
+        """
+        rows = _print_and_run(cur, query)
+        print_rows(rows)
+        cur.close()
+    except Error as e:
+        print(Fore.RED + f"❌ {e}")
+
+
+def equipment_stock_alert(connection):
+    """Aggregate equipment across safehouses and flag low stock items."""
+    print_header("EQUIPMENT STOCK ALERT")
+    try:
+        threshold_raw = input("Show equipment with total quantity less than (default 50): ").strip()
+        threshold = int(threshold_raw) if threshold_raw else 50
+        cur = connection.cursor(dictionary=True)
+        query = """
+        SELECT e.equipment_id, e.equipment_type,
+               SUM(el.quantity) AS total_quantity,
+               GROUP_CONCAT(DISTINCT CONCAT(sh.safehouse_id, ':', sh.city) SEPARATOR ', ') AS locations
+        FROM EQUIPMENT e
+        LEFT JOIN EQUIPMENT_LOCATION el ON e.equipment_id = el.equipment_id
+        LEFT JOIN SAFEHOUSE sh ON el.safehouse_id = sh.safehouse_id
+        GROUP BY e.equipment_id
+        HAVING total_quantity < %s
+        ORDER BY total_quantity ASC;
+        """
+        rows = _print_and_run(cur, query, (threshold,))
+        print_rows(rows)
         cur.close()
     except Error as e:
         print(Fore.RED + f"❌ {e}")
@@ -349,7 +511,12 @@ def main_menu(connection):
 12. Assign Equipment to Safehouse
 13. Update Equipment Count
 14. Delete Equipment
-15. Exit
+15. Mission Summary (complex JOIN/AGG)
+16. Police Activity Report (complex JOIN/AGG)
+17. Supplier Resource Usage (3-table JOIN)
+18. High-risk Hostages & Security (multi JOIN)
+19. Equipment Stock Alert (aggregation + HAVING)
+20. Exit
 =====================================================================
 """)
 
@@ -369,7 +536,12 @@ def main_menu(connection):
         elif ch == "12": assign_equipment_location(connection)
         elif ch == "13": update_equipment_count(connection)
         elif ch == "14": delete_equipment(connection)
-        elif ch == "15":
+        elif ch == "15": mission_summary(connection)
+        elif ch == "16": police_activity_report(connection)
+        elif ch == "17": supplier_resource_usage(connection)
+        elif ch == "18": high_risk_hostages_and_security(connection)
+        elif ch == "19": equipment_stock_alert(connection)
+        elif ch == "20":
             print(Fore.GREEN + "\n👋 Exiting...")
             break
         else:
