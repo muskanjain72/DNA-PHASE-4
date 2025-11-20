@@ -6,99 +6,99 @@ USE money_heist;
 
 -- POLICE (15 rows)
 INSERT INTO POLICE (police_id, first_name, mid_name, last_name, unit, role) VALUES
-(1,'Alicia','M.','Ramos','Negotiations Unit','Lead Negotiator'),
-(2,'David',NULL,'Khan','Tactical Response','Field Commander'),
-(3,'Priya','S.','Singh','Forensics','Evidence Analyst'),
-(4,'Marcus',NULL,'Lopez','Intelligence','Analyst'),
-(5,'Hannah','E.','Osei','Negotiations Unit','Negotiator'),
-(6,'Liu',NULL,'Chen','Tactical Response','Tactical Officer'),
-(7,'Omar','A.','Zayed','Cyber','Digital Forensics'),
-(8,'Natalie',NULL,'Brown','Hostage Response','Coordinator'),
-(9,'Igor',NULL,'Petrov','Tactical Response','Sniper'),
-(10,'Sofia',NULL,'Garcia','Liaison','Public Liaison'),
-(11,'Ahmed',NULL,'Saleem','Intelligence','Analyst'),
-(12,'Grace',NULL,'Park','Forensics','Lab Tech'),
-(13,'Kofi',NULL,'Mensah','Negotiations Unit','Support Negotiator'),
-(14,'Yara',NULL,'Alami','Tactical Response','Medic'),
-(15,'Tom',NULL,'Reed','Logistics','Logistics Officer');
+(10001,'Alicia','M.','Ramos','Negotiations Unit','Lead Negotiator'),
+(10002,'David',NULL,'Khan','Tactical Response','Field Commander'),
+(10003,'Priya','S.','Singh','Forensics','Evidence Analyst'),
+(10004,'Marcus',NULL,'Lopez','Intelligence','Analyst'),
+(10005,'Hannah','E.','Osei','Negotiations Unit','Negotiator'),
+(10006,'Liu',NULL,'Chen','Tactical Response','Tactical Officer'),
+(10007,'Omar','A.','Zayed','Cyber','Digital Forensics'),
+(10008,'Natalie',NULL,'Brown','Hostage Response','Coordinator'),
+(10009,'Igor',NULL,'Petrov','Tactical Response','Sniper'),
+(10010,'Sofia',NULL,'Garcia','Liaison','Public Liaison'),
+(10011,'Ahmed',NULL,'Saleem','Intelligence','Analyst'),
+(10012,'Grace',NULL,'Park','Forensics','Lab Tech'),
+(10013,'Kofi',NULL,'Mensah','Negotiations Unit','Support Negotiator'),
+(10014,'Yara',NULL,'Alami','Tactical Response','Medic'),
+(10015,'Tom',NULL,'Reed','Logistics','Logistics Officer');
 
 -- POLICE_CONTACT (25 rows)
 INSERT INTO POLICE_CONTACT (police_id, phone_number, email) VALUES
-(1,'+1-555-0101','alicia.ramos@citypd.example'),(1,'+1-555-0102','a.ramos@citypd.example'),
-(2,'+1-555-0201','david.khan@citypd.example'),(2,'+1-555-0202','khan.david@citypd.example'),
-(3,'+1-555-0301','priya.singh@citypd.example'),(4,'+1-555-0401','marcus.lopez@citypd.example'),
-(5,'+1-555-0501','hannah.osei@citypd.example'),(5,'+1-555-0502','h.osei@citypd.example'),
-(6,'+1-555-0601','liu.chen@citypd.example'),(7,'+1-555-0701','omar.zayed@citypd.example'),
-(8,'+1-555-0801','natalie.brown@citypd.example'),(9,'+1-555-0901','igor.petrov@citypd.example'),
-(10,'+1-555-1001','sofia.garcia@citypd.example'),(11,'+1-555-1101','ahmed.saleem@citypd.example'),
-(12,'+1-555-1201','grace.park@citypd.example'),(13,'+1-555-1301','kofi.mensah@citypd.example'),
-(14,'+1-555-1401','yara.alami@citypd.example'),(15,'+1-555-1501','tom.reed@citypd.example'),
-(3,'+1-555-0302','priya.alt@citypd.example'),(4,'+1-555-0402','marcus.alt@citypd.example'),
-(6,'+1-555-0602','liu.alt@citypd.example'),(7,'+1-555-0702','omar.alt@citypd.example'),
-(8,'+1-555-0802','natalie.alt@citypd.example'),(9,'+1-555-0902','igor.alt@citypd.example'),(10,'+1-555-1002','sofia.alt@citypd.example');
+(10001,'+1-555-0101','alicia.ramos@citypd.example'),(10001,'+1-555-0102','a.ramos@citypd.example'),
+(10002,'+1-555-0201','david.khan@citypd.example'),(10002,'+1-555-0202','khan.david@citypd.example'),
+(10003,'+1-555-0301','priya.singh@citypd.example'),(10004,'+1-555-0401','marcus.lopez@citypd.example'),
+(10005,'+1-555-0501','hannah.osei@citypd.example'),(10005,'+1-555-0502','h.osei@citypd.example'),
+(10006,'+1-555-0601','liu.chen@citypd.example'),(10007,'+1-555-0701','omar.zayed@citypd.example'),
+(10008,'+1-555-0801','natalie.brown@citypd.example'),(10009,'+1-555-0901','igor.petrov@citypd.example'),
+(10010,'+1-555-1001','sofia.garcia@citypd.example'),(10011,'+1-555-1101','ahmed.saleem@citypd.example'),
+(10012,'+1-555-1201','grace.park@citypd.example'),(10013,'+1-555-1301','kofi.mensah@citypd.example'),
+(10014,'+1-555-1401','yara.alami@citypd.example'),(10015,'+1-555-1501','tom.reed@citypd.example'),
+(10003,'+1-555-0302','priya.alt@citypd.example'),(10004,'+1-555-0402','marcus.alt@citypd.example'),
+(10006,'+1-555-0602','liu.alt@citypd.example'),(10007,'+1-555-0702','omar.alt@citypd.example'),
+(10008,'+1-555-0802','natalie.alt@citypd.example'),(10009,'+1-555-0902','igor.alt@citypd.example'),(10010,'+1-555-1002','sofia.alt@citypd.example');
 
 -- TEAM_MEMBERS (20 rows)
 INSERT INTO TEAM_MEMBERS (member_id, code_name, is_inside_mint, role) VALUES
-(1001,'The Professor',FALSE,'Mastermind'),(1002,'Tokyo',TRUE,'Operative'),(1003,'Rio',TRUE,'Hacker'),
-(1004,'Denver',TRUE,'Demolitions'),(1005,'Berlin',FALSE,'Coordinator'),(1006,'Nairobi',TRUE,'Logistics'),
-(1007,'Helsinki',TRUE,'Enforcer'),(1008,'Oslo',TRUE,'Driver'),(1009,'Stockholm',FALSE,'Negotiator Support'),
-(1010,'Lisbon',FALSE,'Field Planner'),(1011,'Palermo',TRUE,'Tactical Lead'),(1012,'Bogota',TRUE,'Support'),
-(1013,'Manila',TRUE,'Medic'),(1014,'Sierra',FALSE,'Observer'),(1015,'Delta',TRUE,'Tech Support'),
-(1016,'Echo',FALSE,'Scout'),(1017,'Foxtrot',TRUE,'Analyst'),(1018,'Gamma',TRUE,'Mechanic'),(1019,'Hotel',FALSE,'Communications'),(1020,'India',TRUE,'Backup');
+(11001,'The Professor',FALSE,'Mastermind'),(11002,'Tokyo',TRUE,'Operative'),(11003,'Rio',TRUE,'Hacker'),
+(11004,'Denver',TRUE,'Demolitions'),(11005,'Berlin',FALSE,'Coordinator'),(11006,'Nairobi',TRUE,'Logistics'),
+(11007,'Helsinki',TRUE,'Enforcer'),(11008,'Oslo',TRUE,'Driver'),(11009,'Stockholm',FALSE,'Negotiator Support'),
+(11010,'Lisbon',FALSE,'Field Planner'),(11011,'Palermo',TRUE,'Tactical Lead'),(11012,'Bogota',TRUE,'Support'),
+(11013,'Manila',TRUE,'Medic'),(11014,'Sierra',FALSE,'Observer'),(11015,'Delta',TRUE,'Tech Support'),
+(11016,'Echo',FALSE,'Scout'),(11017,'Foxtrot',TRUE,'Analyst'),(11018,'Gamma',TRUE,'Mechanic'),(11019,'Hotel',FALSE,'Communications'),(11020,'India',TRUE,'Backup');
 
 -- TEAM_MEMBER_CONTACT (30 rows)
 INSERT INTO TEAM_MEMBER_CONTACT (member_id, phone_number, email) VALUES
-(1001,'+44-7777-1001','professor@underground.example'),(1002,'+44-7777-1002','tokyo@underground.example'),
-(1003,'+44-7777-1003','rio@underground.example'),(1004,'+44-7777-1004','denver@underground.example'),
-(1005,'+44-7777-1005','berlin@underground.example'),(1006,'+44-7777-1006','nairobi@underground.example'),
-(1007,'+44-7777-1007','helsinki@underground.example'),(1008,'+44-7777-1008','oslo@underground.example'),
-(1009,'+44-7777-1009','stockholm@underground.example'),(1010,'+44-7777-1010','lisbon@underground.example'),
-(1011,'+44-7777-1011','palermo@underground.example'),(1012,'+44-7777-1012','bogota@underground.example'),
-(1013,'+44-7777-1013','manila@underground.example'),(1014,'+44-7777-1014','sierra@underground.example'),
-(1015,'+44-7777-1015','delta@underground.example'),(1016,'+44-7777-1016','echo@underground.example'),(1017,'+44-7777-1017','foxtrot@underground.example'),
-(1018,'+44-7777-1018','gamma@underground.example'),(1019,'+44-7777-1019','hotel@underground.example'),(1020,'+44-7777-1020','india@underground.example'),
-(1003,'+44-7777-1303','rio.alt@underground.example'),(1006,'+44-7777-1306','nairobi.alt@underground.example'),(1002,'+44-7777-1202','tokyo.alt@underground.example'),
-(1004,'+44-7777-1204','denver.alt@underground.example'),(1009,'+44-7777-1209','stockholm.alt@underground.example'),(1011,'+44-7777-1211','palermo.alt@underground.example'),
-(1015,'+44-7777-1215','delta.alt@underground.example'),(1018,'+44-7777-1218','gamma.alt@underground.example'),(1020,'+44-7777-1220','india.alt@underground.example');
+(11001,'+44-7777-1001','professor@underground.example'),(11002,'+44-7777-1002','tokyo@underground.example'),
+(11003,'+44-7777-1003','rio@underground.example'),(11004,'+44-7777-1004','denver@underground.example'),
+(11005,'+44-7777-1005','berlin@underground.example'),(11006,'+44-7777-1006','nairobi@underground.example'),
+(11007,'+44-7777-1007','helsinki@underground.example'),(11008,'+44-7777-1008','oslo@underground.example'),
+(11009,'+44-7777-1009','stockholm@underground.example'),(11010,'+44-7777-1010','lisbon@underground.example'),
+(11011,'+44-7777-1011','palermo@underground.example'),(11012,'+44-7777-1012','bogota@underground.example'),
+(11013,'+44-7777-1013','manila@underground.example'),(11014,'+44-7777-1014','sierra@underground.example'),
+(11015,'+44-7777-1015','delta@underground.example'),(11016,'+44-7777-1016','echo@underground.example'),(11017,'+44-7777-1017','foxtrot@underground.example'),
+(11018,'+44-7777-1018','gamma@underground.example'),(11019,'+44-7777-1019','hotel@underground.example'),(11020,'+44-7777-1020','india@underground.example'),
+(11003,'+44-7777-1303','rio.alt@underground.example'),(11006,'+44-7777-1306','nairobi.alt@underground.example'),(11002,'+44-7777-1202','tokyo.alt@underground.example'),
+(11004,'+44-7777-1204','denver.alt@underground.example'),(11009,'+44-7777-1209','stockholm.alt@underground.example'),(11011,'+44-7777-1211','palermo.alt@underground.example'),
+(11015,'+44-7777-1215','delta.alt@underground.example'),(11018,'+44-7777-1218','gamma.alt@underground.example'),(11020,'+44-7777-1220','india.alt@underground.example');
 
 -- CREW (15+ rows)
 INSERT INTO CREW (member_id) VALUES
-(1002),(1003),(1004),(1005),(1006),(1007),(1008),(1009),(1010),(1011),(1012),(1013),(1014),(1015),(1016);
+(11002),(11003),(11004),(11005),(11006),(11007),(11008),(11009),(11010),(11011),(11012),(11013),(11014),(11015),(11016);
 
 -- PROFESSOR (15 rows) - map several members as 'professor' roles for testing purposes
 INSERT INTO PROFESSOR (member_id, professor_name) VALUES
-(1001,'Sergio Marquina'),(1010,'Lucia Varela'),(1011,'Diego Marquez'),(1012,'Helena Costa'),(1013,'Ricardo Alves'),
-(1014,'Marta Silva'),(1015,'Antonio Ruiz'),(1016,'Rosa Mendes'),(1017,'Enzo Ricci'),(1018,'Priya Kapoor'),
-(1019,'Liam OBrien'),(1020,'Yuki Sato'),(1005,'Berlin Professor'),(1006,'Nairobi Professor'),(1007,'Helsinki Professor');
+(11001,'Sergio Marquina'),(11010,'Lucia Varela'),(11011,'Diego Marquez'),(11012,'Helena Costa'),(11013,'Ricardo Alves'),
+(11014,'Marta Silva'),(11015,'Antonio Ruiz'),(11016,'Rosa Mendes'),(11017,'Enzo Ricci'),(11018,'Priya Kapoor'),
+(11019,'Liam OBrien'),(11020,'Yuki Sato'),(11005,'Berlin Professor'),(11006,'Nairobi Professor'),(11007,'Helsinki Professor');
 
 -- HACKER (15 rows) - map many team members as hackers for testing
 INSERT INTO HACKER (member_id) VALUES
-(1003),(1015),(1009),(1017),(1018),(1012),(1016),(1002),(1011),(1020),(1014),(1006),(1013),(1010),(1001);
+(11003),(11015),(11009),(11017),(11018),(11012),(11016),(11002),(11011),(11020),(11014),(11006),(11013),(11010),(11001);
 
 -- SUPPLIERS (15 rows)
 INSERT INTO SUPPLIER (supplier_id, first_name, mid_name, last_name, reliability_score) VALUES
-(4001,'Luis',NULL,'Gomez','High'),(4002,'Maya','R.','Fernandez','Medium'),(4003,'Omar',NULL,'Kavak','Low'),
-(4004,'Sara',NULL,'Mendez','High'),(4005,'Vikram','K.','Patel','Medium'),(4006,'Anna',NULL,'Ivanova','Low'),
-(4007,'Juan',NULL,'Torres','High'),(4008,'Leila',NULL,'Khan','Medium'),(4009,'Tom',NULL,'Boyle','Low'),
-(4010,'Zoe',NULL,'Keller','High'),(4011,'Igor',NULL,'Smirnov','Medium'),(4012,'Chen',NULL,'Wei','High'),
-(4013,'Fatima',NULL,'Nour','Medium'),(4014,'Pedro',NULL,'Santos','Low'),(4015,'Mei',NULL,'Lin','High');
+(14001,'Luis',NULL,'Gomez','High'),(14002,'Maya','R.','Fernandez','Medium'),(14003,'Omar',NULL,'Kavak','Low'),
+(14004,'Sara',NULL,'Mendez','High'),(14005,'Vikram','K.','Patel','Medium'),(14006,'Anna',NULL,'Ivanova','Low'),
+(14007,'Juan',NULL,'Torres','High'),(14008,'Leila',NULL,'Khan','Medium'),(14009,'Tom',NULL,'Boyle','Low'),
+(14010,'Zoe',NULL,'Keller','High'),(14011,'Igor',NULL,'Smirnov','Medium'),(14012,'Chen',NULL,'Wei','High'),
+(14013,'Fatima',NULL,'Nour','Medium'),(14014,'Pedro',NULL,'Santos','Low'),(14015,'Mei',NULL,'Lin','High');
 
 INSERT INTO SUPPLIER_CONTACT (supplier_id, phone_number, email) VALUES
-(4001,'+34-600-440-001','luis.gomez@supply.example'),(4002,'+34-600-440-002','maya.fernandez@supply.example'),
-(4003,'+90-530-220-003','omar.kavak@supply.example'),(4004,'+1-333-440-004','sara.mendez@parts.example'),
-(4005,'+91-800-440-005','vikram.patel@parts.example'),(4006,'+7-900-440-006','anna.ivanova@parts.example'),
-(4007,'+52-55-440-007','juan.torres@parts.example'),(4008,'+92-21-440-008','leila.khan@parts.example'),
-(4009,'+44-20-440-009','tom.boyle@parts.example'),(4010,'+49-30-440-010','zoe.keller@parts.example'),
-(4011,'+7-495-440-011','igor.smirnov@parts.example'),(4012,'+86-10-440-012','chen.wei@parts.example'),
-(4013,'+212-600-440-013','fatima.nour@parts.example'),(4014,'+351-21-440-014','pedro.santos@parts.example'),(4015,'+86-21-440-015','mei.lin@parts.example');
+(14001,'+34-600-440-001','luis.gomez@supply.example'),(14002,'+34600440002','maya.fernandez@supply.example'),
+(14003,'+90-530-220-003','omar.kavak@supply.example'),(14004,'+133440004','sara.mendez@parts.example'),
+(14005,'+91-800-440-005','vikram.patel@parts.example'),(14006,'+7900440006','anna.ivanova@parts.example'),
+(14007,'+52-55-440-007','juan.torres@parts.example'),(14008,'+9221440008','leila.khan@parts.example'),
+(14009,'+44-20-440-009','tom.boyle@parts.example'),(14010,'+4930440010','zoe.keller@parts.example'),
+(14011,'+7-495-440-011','igor.smirnov@parts.example'),(14012,'+8610440012','chen.wei@parts.example'),
+(14013,'+212-600-440-013','fatima.nour@parts.example'),(14014,'+35121440014','pedro.santos@parts.example'),(14015,'+86-21-440-015','mei.lin@parts.example');
 
 -- SAFEHOUSES (15+ rows)
 INSERT INTO SAFEHOUSE (safehouse_id, capacity, security_level, is_active, street, city, code) VALUES
-(10,6,'High',TRUE,'24 River Lane','Lisbon',9021),(11,4,'Medium',TRUE,'8 Old Harbor','Lisbon',9022),(12,3,'Low',TRUE,'3 Market Alley','Porto',9023),
-(13,8,'High',FALSE,'100 North Quay','Lisbon',9024),(14,10,'High',TRUE,'1 King Street','Madrid',9025),(15,5,'Medium',TRUE,'45 Elm Rd','Barcelona',9026),
-(16,7,'High',TRUE,'90 South Pier','Valencia',9027),(17,2,'Low',TRUE,'7 Side Lane','Coimbra',9028),(18,4,'Medium',TRUE,'18 Old Mill','Braga',9029),
-(19,6,'High',TRUE,'200 Central Ave','Seville',9030),(20,3,'Low',TRUE,'66 Baker Street','London',9031),(21,12,'High',TRUE,'5 Dockside','Marseille',9032),
-(22,8,'Medium',TRUE,'82 Canal Road','Venice',9033),(23,9,'High',TRUE,'11 Harbour Drive','Genoa',9034),(24,4,'Low',FALSE,'3 Back Alley','Bilbao',9035);
+(10010,6,'High',TRUE,'24 River Lane','Lisbon',9021),(10011,4,'Medium',TRUE,'8 Old Harbor','Lisbon',9022),(10012,3,'Low',TRUE,'3 Market Alley','Porto',9023),
+(10013,8,'High',FALSE,'100 North Quay','Lisbon',9024),(10014,10,'High',TRUE,'1 King Street','Madrid',9025),(10015,5,'Medium',TRUE,'45 Elm Rd','Barcelona',9026),
+(10016,7,'High',TRUE,'90 South Pier','Valencia',9027),(10017,2,'Low',TRUE,'7 Side Lane','Coimbra',9028),(10018,4,'Medium',TRUE,'18 Old Mill','Braga',9029),
+(10019,6,'High',TRUE,'200 Central Ave','Seville',9030),(10020,3,'Low',TRUE,'66 Baker Street','London',9031),(10021,12,'High',TRUE,'5 Dockside','Marseille',9032),
+(10022,8,'Medium',TRUE,'82 Canal Road','Venice',9033),(10023,9,'High',TRUE,'11 Harbour Drive','Genoa',9034),(10024,4,'Low',FALSE,'3 Back Alley','Bilbao',9035);
 
 -- EQUIPMENT (15+ rows) - include equipment_count and curr_location_id as required by schema
 INSERT INTO EQUIPMENT (equipment_id, equipment_type, total_quantity, criticality_level, equipment_count, curr_location_id) VALUES

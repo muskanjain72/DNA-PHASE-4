@@ -151,26 +151,16 @@ INSERT INTO DEPENDENTS (first_name, mid_name, last_name, hostage_id, relation, a
 ('Rahul', NULL, 'Patnaik', 6, 'Son', 22),
 ('Neeraj', NULL, 'Patnaik', 6, 'Son', 19),
 ('Om', NULL, 'Roy', 7, 'Husband', 44),
-
 ('Reena', NULL, 'Bhat', 8, 'Wife', 31),
-
 ('Trisha', NULL, 'Gupta', 9, 'Sister', 19),
-
 ('Kashish', NULL, 'Khan', 10, 'Wife', 33),
-
 ('Mahima', NULL, 'Pillai', 11, 'Daughter', 18),
 ('Arvind', NULL, 'Pillai', 11, 'Husband', 50),
-
 ('Anish', NULL, 'Agarwal', 12, 'Son', 12),
-
 ('Vidya', NULL, 'Das', 13, 'Mother', 53),
-
 ('Naina', NULL, 'Shah', 14, 'Wife', 29),
-
 ('Rohit', NULL, 'Chopra', 15, 'Brother', 24),
-
 ('Vaishnavi', NULL, 'Kumar', 16, 'Wife', 52),
-
 ('Dev', NULL, 'Bhandari', 17, 'Husband', 35);
 
 -- =============================

@@ -219,10 +219,10 @@ CREATE TABLE COLLECTED_DURING
 -- 22) COMMUNICATION_LOG
 CREATE TABLE COMMUNICATION_LOG
 (
-    channel_id INT PRIMARY KEY,
+    channel_id INT PRIMARY KEY AUTO_INCREMENT,
     timestamp TIMESTAMP NOT NULL,
     msg_type TEXT NOT NULL,
-    negotiator_id INT NOT NULL,
+    -- negotiator_id INT NOT NULL,
     duration INT NOT NULL,
     content TEXT NOT NULL,
     police_id INT,
