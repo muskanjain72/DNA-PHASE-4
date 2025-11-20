@@ -2,9 +2,12 @@ DROP DATABASE IF EXISTS money_heist;
 CREATE DATABASE money_heist;
 USE money_heist;
 
--- 1) POLICE (parent)
-CREATE TABLE POLICE (
-    police_id INT PRIMARY KEY,
+/* =============================
+   1) POLICE  (PARENT)
+   ============================= */
+CREATE TABLE POLICE
+(
+    police_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     mid_name VARCHAR(50),
     last_name VARCHAR(50),
@@ -12,9 +15,12 @@ CREATE TABLE POLICE (
     role VARCHAR(100) NOT NULL
 );
 
--- 2) POLICE_CONTACT
-CREATE TABLE POLICE_CONTACT (
-    police_id INT,
+/* =============================
+   2) POLICE_CONTACT
+   ============================= */
+CREATE TABLE POLICE_CONTACT
+(
+    police_id INT NOT NULL,
     phone_number VARCHAR(15) NOT NULL,
     email VARCHAR(100) NOT NULL,
     PRIMARY KEY (police_id, phone_number, email),
@@ -23,138 +29,28 @@ CREATE TABLE POLICE_CONTACT (
         ON UPDATE CASCADE
 );
 
--- 3) TEAM_MEMBERS (parent for many tables)
-CREATE TABLE TEAM_MEMBERS (
-    member_id INT PRIMARY KEY,
-    code_name VARCHAR(50) NOT NULL,
-    is_inside_mint BOOLEAN NOT NULL,
-    role VARCHAR(100) NOT NULL
-);
-
--- 4) TEAM_MEMBER_CONTACT
-CREATE TABLE TEAM_MEMBER_CONTACT (
-    member_id INT,
-    phone_number VARCHAR(15) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    PRIMARY KEY (member_id, phone_number, email),
-    FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- 5) CREW (references TEAM_MEMBERS)
-CREATE TABLE CREW (
-    member_id INT PRIMARY KEY,
-    FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- 6) PROFESSOR (references TEAM_MEMBERS)
-CREATE TABLE PROFESSOR (
-    member_id INT PRIMARY KEY,
-    professor_name VARCHAR(100) NOT NULL,
-    FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- 7) HACKER (references TEAM_MEMBERS)
-CREATE TABLE HACKER (
-    member_id INT PRIMARY KEY,
-    FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- 8) SAFEHOUSE (must exist before EQUIPMENT, MISSION_EXECUTION, RESOURCE_COORDINATION, LOOT)
-CREATE TABLE SAFEHOUSE (
-    safehouse_id INT PRIMARY KEY,
-    capacity INT NOT NULL,
-    security_level VARCHAR(50) NOT NULL,
-    is_active BOOLEAN NOT NULL,
-    street VARCHAR(100) NOT NULL,
-    city VARCHAR(50) NOT NULL,
-    code INT NOT NULL
-);
-
--- 9) EQUIPMENT
--- Kept the given attributes; equipment_id is primary key.
-CREATE TABLE EQUIPMENT (
-    equipment_id INT PRIMARY KEY,
-    equipment_type VARCHAR(100) NOT NULL,
-    quantity INT DEFAULT 0,
-    curr_location_id INT NOT NULL,
-    criticality_level ENUM('High','Medium','Low') NOT NULL,
-    equipment_count INT NOT NULL,
-    FOREIGN KEY (curr_location_id) REFERENCES SAFEHOUSE(safehouse_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- 10) SUPPLIER
-CREATE TABLE SUPPLIER (
-    first_name VARCHAR(50) NOT NULL,
-    mid_name VARCHAR(50),
-    last_name VARCHAR(50),
-    supplier_id INT PRIMARY KEY,
-    reliability_score ENUM('High','Medium','Low') NOT NULL
-);
-
--- 11) SUPPLIER_CONTACT
-CREATE TABLE SUPPLIER_CONTACT (
-    supplier_id INT NOT NULL,
-    phone_number VARCHAR(15) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    PRIMARY KEY (supplier_id, phone_number, email),
-    FOREIGN KEY (supplier_id) REFERENCES SUPPLIER(supplier_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- 12) MISSIONS
-CREATE TABLE MISSIONS (
-    mission_id INT AUTO_INCREMENT PRIMARY KEY,
-    mission_code VARCHAR(20) NOT NULL UNIQUE,
-    start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP,
-    stage ENUM('Planned','Ongoing','Completed','Failed') NOT NULL,
-    zone VARCHAR(20) NOT NULL,
-    description TEXT
-);
-
--- 13) EVIDENCE
--- Use composite PK (police_id, evidence_id) so it can be referenced together.
-CREATE TABLE EVIDENCE (
+/* =============================
+   3) EVIDENCE  (weak entity)
+   ============================= */
+CREATE TABLE EVIDENCE
+(
     evidence_id INT NOT NULL,
     police_id INT NOT NULL,
-    description TEXT NOT NULL,
+    description TEXT,
     found_time TIMESTAMP NOT NULL,
     threat_level VARCHAR(50) NOT NULL,
-    PRIMARY KEY (police_id, evidence_id),
+    PRIMARY KEY (evidence_id, police_id),
     FOREIGN KEY (police_id) REFERENCES POLICE(police_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
--- 14) COLLECTED_DURING
--- REFERENCES EVIDENCE via (police_id, evidence_id) to match EVIDENCE PK order
-CREATE TABLE COLLECTED_DURING (
-    police_id INT NOT NULL,
-    evidence_id INT NOT NULL,
-    mission_code VARCHAR(20) NOT NULL,
-    PRIMARY KEY (police_id, evidence_id, mission_code),
-    FOREIGN KEY (police_id, evidence_id) REFERENCES EVIDENCE(police_id, evidence_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    FOREIGN KEY (mission_code) REFERENCES MISSIONS(mission_code)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- 15) HOSTAGES (references POLICE)
-CREATE TABLE HOSTAGES (
-    hostage_id INT PRIMARY KEY,
+/* =============================
+   4) HOSTAGES
+   ============================= */
+CREATE TABLE HOSTAGES
+(
+    hostage_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     mid_name VARCHAR(50),
     last_name VARCHAR(50),
@@ -169,19 +65,25 @@ CREATE TABLE HOSTAGES (
         ON UPDATE CASCADE
 );
 
--- 16) HOSTAGE_MEDICAL_CONDITION
-CREATE TABLE HOSTAGE_MEDICAL_CONDITION (
+/* =============================
+   5) HOSTAGE MEDICAL CONDITION
+   ============================= */
+CREATE TABLE HOSTAGE_MEDICAL_CONDITION
+(
     hostage_id INT NOT NULL,
-    hostage_ailment VARCHAR(100) NOT NULL,
+    hostage_ailment VARCHAR(255) NOT NULL,
     PRIMARY KEY (hostage_id, hostage_ailment),
     FOREIGN KEY (hostage_id) REFERENCES HOSTAGES(hostage_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
--- 17) DEPENDENTS
-CREATE TABLE DEPENDENTS (
-    dependent_id INT PRIMARY KEY,
+/* =============================
+   6) DEPENDENTS
+   ============================= */
+CREATE TABLE DEPENDENTS
+(
+    dependent_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     mid_name VARCHAR(50),
     last_name VARCHAR(50),
@@ -193,21 +95,86 @@ CREATE TABLE DEPENDENTS (
         ON UPDATE CASCADE
 );
 
--- 18) SECURITY_SYSTEM (references HACKER)
-CREATE TABLE SECURITY_SYSTEM (
-    system_id INT PRIMARY KEY,
-    system_type VARCHAR(100) NOT NULL,
-    status ENUM('Active','Inactive','Under Maintenance') NOT NULL,
-    location_description TEXT NOT NULL,
-    security_level VARCHAR(50) NOT NULL,
+/* =============================
+   7) TEAM MEMBERS
+   ============================= */
+CREATE TABLE TEAM_MEMBERS
+(
+    member_id INT AUTO_INCREMENT PRIMARY KEY,
+    code_name VARCHAR(50) NOT NULL,
+    is_inside_mint BOOLEAN NOT NULL DEFAULT FALSE,
+    role VARCHAR(100) NOT NULL
+);
+
+/* =============================
+   8) TEAM MEMBER CONTACT
+   ============================= */
+CREATE TABLE TEAM_MEMBER_CONTACT
+(
     member_id INT NOT NULL,
-    FOREIGN KEY (member_id) REFERENCES HACKER(member_id)
+    phone_number VARCHAR(15) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    PRIMARY KEY (member_id, phone_number, email),
+    FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
--- 19) MONITORED (links HOSTAGES and SECURITY_SYSTEM)
-CREATE TABLE MONITORED (
+/* =============================
+   9) CREW
+   ============================= */
+CREATE TABLE CREW
+(
+    member_id INT PRIMARY KEY,
+    FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+/* =============================
+   10) PROFESSOR
+   ============================= */
+CREATE TABLE PROFESSOR
+(
+    member_id INT PRIMARY KEY,
+    professor_name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+/* =============================
+   11) HACKER
+   ============================= */
+CREATE TABLE HACKER
+(
+    member_id INT PRIMARY KEY,
+    FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+/* =============================
+   12) SECURITY SYSTEM
+   ============================= */
+CREATE TABLE SECURITY_SYSTEM
+(
+    system_id INT AUTO_INCREMENT PRIMARY KEY,
+    system_type VARCHAR(100) NOT NULL,
+    status ENUM('Active','Inactive','Under Maintenance') NOT NULL,
+    location_description TEXT,
+    security_level VARCHAR(50),
+    member_id INT,
+    FOREIGN KEY (member_id) REFERENCES HACKER(member_id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
+
+/* =============================
+   13) MONITORED
+   ============================= */
+CREATE TABLE MONITORED
+(
     hostage_id INT NOT NULL,
     system_id INT NOT NULL,
     PRIMARY KEY (hostage_id, system_id),
@@ -219,8 +186,11 @@ CREATE TABLE MONITORED (
         ON UPDATE CASCADE
 );
 
--- 20) CLAIMS (POLICE <-> HOSTAGES)
-CREATE TABLE CLAIMS (
+/* =============================
+   14) CLAIMS
+   ============================= */
+CREATE TABLE CLAIMS
+(
     police_id INT NOT NULL,
     hostage_id INT NOT NULL,
     PRIMARY KEY (police_id, hostage_id),
@@ -232,8 +202,11 @@ CREATE TABLE CLAIMS (
         ON UPDATE CASCADE
 );
 
--- 21) NEGOTIATES (POLICE <-> TEAM_MEMBERS)
-CREATE TABLE NEGOTIATES (
+/* =============================
+   15) NEGOTIATES
+   ============================= */
+CREATE TABLE NEGOTIATES
+(
     police_id INT NOT NULL,
     member_id INT NOT NULL,
     PRIMARY KEY (police_id, member_id),
@@ -245,28 +218,64 @@ CREATE TABLE NEGOTIATES (
         ON UPDATE CASCADE
 );
 
--- 22) COMMUNICATION_LOG
--- Added police_id and member_id columns (they were referenced but missing)
-CREATE TABLE COMMUNICATION_LOG (
-    channel_id INT PRIMARY KEY,
+/* =============================
+   16) MISSIONS
+   ============================= */
+CREATE TABLE MISSIONS
+(
+    mission_id INT AUTO_INCREMENT PRIMARY KEY,
+    mission_code VARCHAR(20) NOT NULL UNIQUE,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP,
+    stage ENUM('Planned','Ongoing','Completed','Failed') NOT NULL,
+    zone VARCHAR(20) NOT NULL,
+    description TEXT
+);
+
+/* =============================
+   17) COLLECTED DURING
+   ============================= */
+CREATE TABLE COLLECTED_DURING
+(
+    police_id INT NOT NULL,
+    evidence_id INT NOT NULL,
+    mission_code VARCHAR(20) NOT NULL,
+    PRIMARY KEY (police_id, evidence_id, mission_code),
+    FOREIGN KEY (police_id, evidence_id) REFERENCES EVIDENCE(police_id, evidence_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (mission_code) REFERENCES MISSIONS(mission_code)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+/* =============================
+   18) COMMUNICATION LOG (cleaned)
+   ============================= */
+CREATE TABLE COMMUNICATION_LOG
+(
+    channel_id INT AUTO_INCREMENT PRIMARY KEY,
     timestamp TIMESTAMP NOT NULL,
     msg_type TEXT NOT NULL,
-    negotiator_id INT NOT NULL,
     duration INT NOT NULL,
     content TEXT NOT NULL,
     police_id INT,
     member_id INT,
     FOREIGN KEY (police_id) REFERENCES POLICE(police_id)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
         ON UPDATE CASCADE,
     FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
--- 23) STRATEGIC_PLANNING
-CREATE TABLE STRATEGIC_PLANNING (
-    member_id INT PRIMARY KEY,
+/* =============================
+   19) STRATEGIC PLANNING
+   ============================= */
+CREATE TABLE STRATEGIC_PLANNING
+(
+    planning_id INT AUTO_INCREMENT PRIMARY KEY,
+    member_id INT NOT NULL,
     mission_code VARCHAR(20) NOT NULL,
     channel_id INT NOT NULL,
     timestamp TIMESTAMP NOT NULL,
@@ -285,12 +294,62 @@ CREATE TABLE STRATEGIC_PLANNING (
         ON UPDATE CASCADE
 );
 
--- 24) MISSION_EXECUTION
-CREATE TABLE MISSION_EXECUTION (
-    mission_code VARCHAR(20),
+/* =============================
+   20) SAFEHOUSE
+   ============================= */
+CREATE TABLE SAFEHOUSE
+(
+    safehouse_id INT AUTO_INCREMENT PRIMARY KEY,
+    capacity INT NOT NULL,
+    security_level VARCHAR(50) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    street VARCHAR(100) NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    code INT NOT NULL
+);
+
+/* =============================
+   21) EQUIPMENT
+   ============================= */
+CREATE TABLE EQUIPMENT
+(
+    equipment_id INT AUTO_INCREMENT PRIMARY KEY,
+    equipment_type VARCHAR(100) NOT NULL,
+    total_quantity INT DEFAULT 0,
+    criticality_level ENUM('High','Medium','Low') NOT NULL,
+    equipment_count INT NOT NULL,
+    curr_location_id INT NOT NULL,
+    FOREIGN KEY (curr_location_id) REFERENCES SAFEHOUSE(safehouse_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+/* =============================
+   22) EQUIPMENT LOCATION
+   ============================= */
+CREATE TABLE EQUIPMENT_LOCATION
+(
+    equipment_id INT NOT NULL,
+    safehouse_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (equipment_id, safehouse_id),
+    FOREIGN KEY (equipment_id) REFERENCES EQUIPMENT(equipment_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (safehouse_id) REFERENCES SAFEHOUSE(safehouse_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+/* =============================
+   23) MISSION EXECUTION
+   ============================= */
+CREATE TABLE MISSION_EXECUTION
+(
+    mission_code VARCHAR(20) NOT NULL,
     member_id INT NOT NULL,
-    safehouse_id INT,
-    equipment_id INT,
+    safehouse_id INT NOT NULL,
+    equipment_id INT NOT NULL,
     PRIMARY KEY (mission_code, member_id, safehouse_id, equipment_id),
     FOREIGN KEY (mission_code) REFERENCES MISSIONS(mission_code)
         ON DELETE CASCADE
@@ -306,8 +365,37 @@ CREATE TABLE MISSION_EXECUTION (
         ON UPDATE CASCADE
 );
 
--- 25) RESOURCE_COORDINATION
-CREATE TABLE RESOURCE_COORDINATION (
+/* =============================
+   24) SUPPLIER
+   ============================= */
+CREATE TABLE SUPPLIER
+(
+    first_name VARCHAR(50) NOT NULL,
+    mid_name VARCHAR(50),
+    last_name VARCHAR(50),
+    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
+    reliability_score ENUM('High','Medium','Low') NOT NULL
+);
+
+/* =============================
+   25) SUPPLIER CONTACT
+   ============================= */
+CREATE TABLE SUPPLIER_CONTACT
+(
+    supplier_id INT NOT NULL,
+    phone_number VARCHAR(15) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    PRIMARY KEY (supplier_id, phone_number, email),
+    FOREIGN KEY (supplier_id) REFERENCES SUPPLIER(supplier_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+/* =============================
+   26) RESOURCE COORDINATION
+   ============================= */
+CREATE TABLE RESOURCE_COORDINATION
+(
     supplier_id INT NOT NULL,
     member_id INT NOT NULL,
     safehouse_id INT NOT NULL,
@@ -323,10 +411,13 @@ CREATE TABLE RESOURCE_COORDINATION (
         ON UPDATE CASCADE
 );
 
--- 26) LOOT
-CREATE TABLE LOOT (
+/* =============================
+   27) LOOT
+   ============================= */
+CREATE TABLE LOOT
+(
     production_date DATE NOT NULL,
-    batch_id INT,
+    batch_id INT AUTO_INCREMENT,
     status ENUM('Stored','In-Transit','Secured') NOT NULL,
     amount DECIMAL(15,2) NOT NULL,
     stored_in_safehouse_id INT NOT NULL,

@@ -3,6 +3,7 @@ CREATE DATABASE money_heist;
 USE money_heist;
 
 /* Core entities: generate numeric ids with AUTO_INCREMENT */
+-- 1) POLICE (parent)
 CREATE TABLE POLICE
 (
     police_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -13,6 +14,7 @@ CREATE TABLE POLICE
     role VARCHAR(100) NOT NULL
 );
 
+-- 2) POLICE_CONTACT
 CREATE TABLE POLICE_CONTACT
 (
     police_id INT NOT NULL,
@@ -24,19 +26,20 @@ CREATE TABLE POLICE_CONTACT
         ON UPDATE CASCADE
 );
 
+-- 13) EVIDENCE
 CREATE TABLE EVIDENCE
 (
     evidence_id INT NOT NULL,
     police_id INT NOT NULL,
     PRIMARY KEY (evidence_id, police_id),
-    description TEXT NOT NULL,
+    description TEXT,
     found_time TIMESTAMP NOT NULL,
     threat_level VARCHAR(50) NOT NULL,
     FOREIGN KEY (police_id) REFERENCES POLICE(police_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
+-- 15) HOSTAGES (references POLICE)
 CREATE TABLE HOSTAGES
 (
     hostage_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -54,7 +57,7 @@ CREATE TABLE HOSTAGES
         ON UPDATE CASCADE
 );
 
-
+-- 16) HOSTAGE_MEDICAL_CONDITION
 CREATE TABLE HOSTAGE_MEDICAL_CONDITION
 (
     hostage_id INT NOT NULL,
@@ -65,6 +68,7 @@ CREATE TABLE HOSTAGE_MEDICAL_CONDITION
         ON UPDATE CASCADE
 );
 
+-- 17) DEPENDENTS (references HOSTAGES)
 CREATE TABLE DEPENDENTS
 (
     dependent_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -79,6 +83,7 @@ CREATE TABLE DEPENDENTS
         ON UPDATE CASCADE
 );
 
+-- 3) TEAM_MEMBERS (parent for many tables)
 CREATE TABLE TEAM_MEMBERS
 (
     member_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -87,6 +92,7 @@ CREATE TABLE TEAM_MEMBERS
     role VARCHAR(100) NOT NULL
 );
 
+-- 4) TEAM_MEMBER_CONTACT
 CREATE TABLE TEAM_MEMBER_CONTACT
 (
     member_id INT NOT NULL,
@@ -97,7 +103,9 @@ CREATE TABLE TEAM_MEMBER_CONTACT
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
 /*Contains the different member-id currently asigned to someone*/
+-- 5) CREW (references TEAM_MEMBERS)
 CREATE TABLE CREW
 (
     member_id INT PRIMARY KEY,
@@ -106,6 +114,7 @@ CREATE TABLE CREW
         ON UPDATE CASCADE
 );
 
+-- 6) PROFESSOR (references TEAM_MEMBERS)
 CREATE TABLE PROFESSOR
 (
     member_id INT PRIMARY KEY,
@@ -115,6 +124,7 @@ CREATE TABLE PROFESSOR
         ON UPDATE CASCADE
 );
 
+-- 7) HACKER (references TEAM_MEMBERS)
 CREATE TABLE HACKER
 (
     member_id INT PRIMARY KEY,
@@ -123,6 +133,7 @@ CREATE TABLE HACKER
         ON UPDATE CASCADE
 );
 
+-- 18) SECURITY_SYSTEM (references HACKER)
 CREATE TABLE SECURITY_SYSTEM
 (
     system_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -136,6 +147,7 @@ CREATE TABLE SECURITY_SYSTEM
         ON UPDATE CASCADE
 );
 
+-- 19) MONITORED (links HOSTAGES and SECURITY_SYSTEM)
 CREATE TABLE MONITORED
 (
     hostage_id INT NOT NULL,
@@ -149,6 +161,7 @@ CREATE TABLE MONITORED
         ON UPDATE CASCADE
 );
 
+-- 20) CLAIMS (POLICE <-> HOSTAGES)
 CREATE TABLE CLAIMS
 (
     police_id INT NOT NULL,
@@ -162,6 +175,7 @@ CREATE TABLE CLAIMS
         ON UPDATE CASCADE
 );
 
+-- 21) NEGOTIATES (POLICE <-> TEAM_MEMBERS)
 CREATE TABLE NEGOTIATES
 (
     police_id INT NOT NULL,
@@ -174,6 +188,8 @@ CREATE TABLE NEGOTIATES
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+-- 12) MISSIONS
 CREATE TABLE MISSIONS
 (
     mission_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -185,16 +201,14 @@ CREATE TABLE MISSIONS
     description TEXT  
 );
 
+-- REFERENCES EVIDENCE via (police_id, evidence_id) to match EVIDENCE PK order
 CREATE TABLE COLLECTED_DURING
 (
     police_id INT NOT NULL,
     evidence_id INT NOT NULL,
     mission_code VARCHAR(20) NOT NULL,
     PRIMARY KEY (police_id, evidence_id, mission_code),
-    FOREIGN KEY (police_id) REFERENCES POLICE(police_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    FOREIGN KEY (evidence_id) REFERENCES EVIDENCE(evidence_id)
+   FOREIGN KEY (police_id, evidence_id) REFERENCES EVIDENCE(police_id, evidence_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     FOREIGN KEY (mission_code) REFERENCES MISSIONS(mission_code)
@@ -202,6 +216,7 @@ CREATE TABLE COLLECTED_DURING
         ON UPDATE CASCADE
 );
 
+-- 22) COMMUNICATION_LOG
 CREATE TABLE COMMUNICATION_LOG
 (
     channel_id INT PRIMARY KEY,
@@ -210,8 +225,17 @@ CREATE TABLE COMMUNICATION_LOG
     negotiator_id INT NOT NULL,
     duration INT NOT NULL,
     content TEXT NOT NULL,
+    police_id INT,
+    member_id INT,
+    FOREIGN KEY (police_id) REFERENCES POLICE(police_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (member_id) REFERENCES TEAM_MEMBERS(member_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
+-- 23) STRATEGIC_PLANNING
 CREATE TABLE STRATEGIC_PLANNING
 (
     planning_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -235,6 +259,7 @@ CREATE TABLE STRATEGIC_PLANNING
 );
 
 /* SAFEHOUSE must exist before equipment locations; define SAFEHOUSE next */
+-- 8) SAFEHOUSE (must exist before EQUIPMENT, MISSION_EXECUTION, RESOURCE_COORDINATION, LOOT)
 CREATE TABLE SAFEHOUSE
 (
     safehouse_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -246,12 +271,18 @@ CREATE TABLE SAFEHOUSE
     code INT NOT NULL
 );
 
+-- 9) EQUIPMENT
 CREATE TABLE EQUIPMENT
 (
     equipment_id INT AUTO_INCREMENT PRIMARY KEY,
     equipment_type VARCHAR(100) NOT NULL,
     total_quantity INT DEFAULT 0,
-    criticality_level ENUM('High','Medium','Low') NOT NULL
+    criticality_level ENUM('High','Medium','Low') NOT NULL,
+    equipment_count INT NOT NULL,
+    curr_location_id INT NOT NULL,
+     FOREIGN KEY (curr_location_id) REFERENCES SAFEHOUSE(safehouse_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 /* Map equipment quantities per safehouse */
@@ -269,6 +300,7 @@ CREATE TABLE EQUIPMENT_LOCATION
         ON UPDATE CASCADE
 );
 
+-- 24) MISSION_EXECUTION
 CREATE TABLE MISSION_EXECUTION
 (
     mission_code VARCHAR(20),
@@ -290,6 +322,7 @@ CREATE TABLE MISSION_EXECUTION
         ON UPDATE CASCADE
 );
 
+-- 10) SUPPLIER
 CREATE TABLE SUPPLIER
 (
     first_name VARCHAR(50) NOT NULL,
@@ -299,6 +332,7 @@ CREATE TABLE SUPPLIER
     reliability_score ENUM('High','Medium','Low') NOT NULL
 );
 
+-- 11) SUPPLIER_CONTACT
 CREATE TABLE SUPPLIER_CONTACT
 (
     supplier_id INT NOT NULL,
@@ -311,7 +345,7 @@ CREATE TABLE SUPPLIER_CONTACT
 );
 /* SAFEHOUSE was moved earlier */
 
-
+-- 25) RESOURCE_COORDINATION
 CREATE TABLE RESOURCE_COORDINATION
 (
     supplier_id INT NOT NULL,
@@ -329,10 +363,11 @@ CREATE TABLE RESOURCE_COORDINATION
         ON UPDATE CASCADE
 );
 
+-- 26) LOOT
 CREATE TABLE LOOT
 (
     production_date DATE NOT NULL,
-    production_date DATE NOT NULL,
+    -- production_date DATE NOT NULL,
     batch_id INT AUTO_INCREMENT,
     status ENUM('Stored','In-Transit','Secured') NOT NULL,
     amount DECIMAL(15,2) NOT NULL,
