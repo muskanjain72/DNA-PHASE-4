@@ -107,7 +107,7 @@ USE money_heist;
 -- 1) POLICE_CONTACT  (each police has 1–2 contacts)
 -- IDs 1..10 from POLICE
 -- =============================
-INSERT INTO POLICE_CONTACT (police_id, phone_number, email) VALUES
+INSERT IGNORE INTO POLICE_CONTACT (police_id, phone_number, email) VALUES
 (1, '9876543201', 'arjun.khanna@ctu.gov'),
 (1, '9876543202', 'akhanna@ctu.gov'),
 (2, '9811122233', 'ritu.verma@intel.gov'),
@@ -123,7 +123,7 @@ INSERT INTO POLICE_CONTACT (police_id, phone_number, email) VALUES
 -- =============================
 -- 2) TEAM_MEMBER_CONTACT (IDs 1..12 from TEAM_MEMBERS)
 -- =============================
-INSERT INTO TEAM_MEMBER_CONTACT (member_id, phone_number, email) VALUES
+INSERT IGNORE INTO TEAM_MEMBER_CONTACT (member_id, phone_number, email) VALUES
 (1, '9001100001', 'prof@operation.net'),
 (2, '9001100002', 'ghost@operation.net'),
 (3, '9001100003', 'cipher@operation.net'),
@@ -144,18 +144,12 @@ INSERT INTO TEAM_MEMBER_CONTACT (member_id, phone_number, email) VALUES
 INSERT INTO DEPENDENTS (first_name, mid_name, last_name, hostage_id, relation, age) VALUES
 ('Kavya', NULL, 'Kapoor', 1, 'Daughter', 17),
 ('Rajiv', NULL, 'Kapoor', 1, 'Husband', 48),
-
 ('Mitali', NULL, 'Mehta', 2, 'Wife', 34),
-
 ('Rupa', NULL, 'Reddy', 3, 'Mother', 55),
-
 ('Sara', NULL, 'Sheikh', 4, 'Wife', 30),
-
 ('Ishita', NULL, 'Singh', 5, 'Sister', 21),
-
 ('Rahul', NULL, 'Patnaik', 6, 'Son', 22),
 ('Neeraj', NULL, 'Patnaik', 6, 'Son', 19),
-
 ('Om', NULL, 'Roy', 7, 'Husband', 44),
 
 ('Reena', NULL, 'Bhat', 8, 'Wife', 31),
@@ -300,7 +294,7 @@ INSERT INTO EVIDENCE (evidence_id, police_id, description, found_time, threat_le
 (1, 8, 'Negotiation transcript fragment saved', '2025-10-09 14:00:00', 'High'),
 (1, 9, 'Drone footage showing approach', '2025-10-10 05:00:00', 'High'),
 (1, 10, 'Chain of custody form for seized document', '2025-10-11 08:20:00', 'Low'),
-(2, 10, 'Law firm's invoice referencing secure transfer', '2025-10-11 09:10:00', 'Medium');
+(2, 10, 'Law firm''s invoice referencing secure transfer', '2025-10-11 09:10:00', 'Medium');
 
 -- =========================
 -- COLLECTED_DURING linking evidence to missions

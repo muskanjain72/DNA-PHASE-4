@@ -303,11 +303,13 @@ CREATE TABLE EQUIPMENT_LOCATION
 -- 24) MISSION_EXECUTION
 CREATE TABLE MISSION_EXECUTION
 (
-    mission_code VARCHAR(20),
+    mission_execution_id INT AUTO_INCREMENT PRIMARY KEY,
+    mission_code VARCHAR(20) NOT NULL,
     member_id INT NOT NULL,
     safehouse_id INT,
     equipment_id INT,
-    PRIMARY KEY (mission_code, member_id,safehouse_id,equipment_id),
+    -- optional composite uniqueness to prevent duplicate assignments
+    UNIQUE KEY unique_exec (mission_code, member_id, safehouse_id, equipment_id),
     FOREIGN KEY (mission_code) REFERENCES MISSIONS(mission_code)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
