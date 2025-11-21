@@ -224,7 +224,7 @@ def mission_summary(connection):
         SELECT me.mission_code,
                COUNT(DISTINCT me.member_id) AS member_count,
                GROUP_CONCAT(DISTINCT t.code_name SEPARATOR ', ') AS members,
-               s.safehouse_id, s.street, s.city,
+               GROUP_CONCAT(DISTINCT CONCAT(s.safehouse_id, ':', s.city) SEPARATOR ', ') AS safehouses,
                COUNT(DISTINCT cd.evidence_id) AS evidence_count
         FROM MISSION_EXECUTION me
         LEFT JOIN TEAM_MEMBERS t ON me.member_id = t.member_id

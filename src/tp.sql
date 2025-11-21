@@ -323,7 +323,7 @@ CREATE TABLE COMMUNICATION_LOG
     content TEXT NOT NULL,
     FOREIGN KEY (negotiator_id) REFERENCES POLICE(police_id)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
 );
 
 -- ---------------------------
@@ -374,12 +374,12 @@ CREATE TABLE EQUIPMENT_SPECIFICATIONS
 -- ---------------------------
 CREATE TABLE MISSION_EXECUTION
 (
-    mission_execution_id INT AUTO_INCREMENT PRIMARY KEY,
     mission_code VARCHAR(20) NOT NULL,
     member_id INT NOT NULL,
     safehouse_id INT,
     equipment_id INT,
     UNIQUE KEY unique_exec (mission_code, member_id, safehouse_id, equipment_id),
+    PRIMARY KEY (mission_code, member_id, safehouse_id, equipment_id),
     FOREIGN KEY (mission_code) REFERENCES MISSION_IDENTIFIER(mission_code)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
